@@ -20,19 +20,29 @@ function createWindow () {
 			label: 'File',
 			submenu: [
 				{
+					label: 'New File',
+					accelerator: 'CmdOrCtrl+N',
+					click: () => {
+						win.webContents.send('newFile')
+					}
+				},
+				{
 					label: 'Open...',
+					accelerator: 'CmdOrCtrl+O',
 					click: () => {
 						win.webContents.send('openFile')
 					}
 				},
 				{
 					label: 'Save',
+					accelerator: 'CmdOrCtrl+S',
 					click: () => {
 						win.webContents.send('saveFile')
 					}
 				},
 				{
 					label: 'Save As...',
+					accelerator: 'Shift+CmdOrCtrl+S',
 					click: () => {
 						win.webContents.send('saveFileAs')
 					}

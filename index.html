@@ -16,6 +16,16 @@
 
 			let curFile
 
+			function updateTitle() {
+				if (curFile === undefined) {
+					document.title = "Text Editor"
+				} else {
+					document.title = "Text Editor - "+curFile
+				}
+			}
+
+			updateTitle()
+
 			// enable tabbing on mainTextArea
 			mainTextArea.onkeydown = (e) => {
 				if (e.code == "Tab") {
@@ -23,14 +33,19 @@
 					let start = mainTextArea.selectionStart
 					let end = mainTextArea.selectionEnd
 
-
 					mainTextArea.value = mainTextArea.value.substring(0, mainTextArea.selectionStart)
 											+ '\t' 
-											+ mainTextArea.value.substring(mainTextArea.selectionStart, mainTextArea.value.length)
+											+ mainTextArea.value.substring(mainTextArea.selectionEnd, mainTextArea.value.length)
 					mainTextArea.selectionStart = 
-					mainTextArea.selectionEnd = start+1
+					mainTextArea.selectionEnd = start + 1
 				}
 			}
+
+			ipc.on('newFile', () => {
+				curFile = undefined
+				mainTextArea.value = ""
+				updateTitle()
+			})
 
 			ipc.on('openFile', () => {
 				let options = {
@@ -40,6 +55,7 @@
 				fs.readFile(curFile, 'UTF-8', (err, data) => {
 					mainTextArea.value = data
 				})
+				updateTitle()
 			})
 
 			ipc.on('saveFile', () => {
@@ -58,12 +74,14 @@
 						}
 					})
 				}
+				updateTitle()
 			})
 
 			ipc.on('saveFileAs', () => {
 				dialog.showSaveDialog((fileName) => {
 					fs.writeFile(fileName, mainTextArea.value)
 				})
+				updateTitle()
 			})
 		</script>
 	</body>
