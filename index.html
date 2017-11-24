@@ -6,7 +6,7 @@
 		<link rel="stylesheet" type="text/css" href="style.css">
 	</head>
 	<body>
-		<textarea id="mainTextArea" rows="4" cols="50"></textarea>
+		<textarea id="mainTextArea"></textarea>
 		<script>
 			const ipc = require('electron').ipcRenderer
 			const {dialog} = require('electron').remote
@@ -14,7 +14,7 @@
 
 			const mainTextArea = document.getElementById("mainTextArea")
 
-			let curFile
+			let curFile, unsavedChanges = false
 
 			function updateTitle() {
 				if (curFile === undefined) {
@@ -23,8 +23,11 @@
 					document.title = "Text Editor - "+curFile
 				}
 			}
-
 			updateTitle()
+
+			mainTextArea.oninput = () => {
+				unsavedChanges = true
+			}
 
 			// enable tabbing on mainTextArea
 			mainTextArea.onkeydown = (e) => {
@@ -44,6 +47,7 @@
 			ipc.on('newFile', () => {
 				curFile = undefined
 				mainTextArea.value = ""
+				unsavedChanges = true
 				updateTitle()
 			})
 
@@ -64,6 +68,8 @@
 						fs.writeFile(fileName, mainTextArea.value, (err) => {
 							if (err) {
 								alert(err)
+							} else {
+								curFile = fileName
 							}
 						})
 					})
@@ -74,15 +80,38 @@
 						}
 					})
 				}
+				unsavedChanges = false
 				updateTitle()
 			})
 
 			ipc.on('saveFileAs', () => {
 				dialog.showSaveDialog((fileName) => {
-					fs.writeFile(fileName, mainTextArea.value)
+					fs.writeFile(fileName, mainTextArea.value, (err) => {
+						if (err) {
+							alert(err)
+						} else {
+							curFile = fileName
+						}
+					})
 				})
+				unsavedChanges = false
 				updateTitle()
 			})
+
+			window.onbeforeunload = (e) => {
+				if (unsavedChanges) {
+					choice = dialog.showMessageBox({
+						type: 'question',
+						buttons: ['Yes', 'No'],
+						title: 'Confirm',
+						message: 'You have made unsaved changes. Are you sure you would like to quit?'
+					})
+					console.log(choice)
+					if (choice !== 0) {
+						e.returnValue = false
+					}
+				}
+			}
 		</script>
 	</body>
 </html>
