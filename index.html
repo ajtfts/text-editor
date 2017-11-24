@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Text Editor</title>
+		<link rel="stylesheet" type="text/css" href="style.css">
+	</head>
+	<body>
+		<textarea id="mainTextArea" rows="4" cols="50"></textarea>
+		<script>
+			const ipc = require('electron').ipcRenderer
+			const {dialog} = require('electron').remote
+			const fs = require('fs')
+
+			const mainTextArea = document.getElementById("mainTextArea")
+
+			ipc.on('saveAs', () => {
+				dialog.showSaveDialog((fileName) => {
+					fs.writeFile(fileName, mainTextArea.value, (err) => {
+						if (err) {
+							alert(err)
+						}
+					})
+				})
+			})
+		</script>
+	</body>
+</html>
