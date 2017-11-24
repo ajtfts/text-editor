@@ -13,7 +13,7 @@ function createWindow () {
 		slashes: true
 	}))
 
-	//win.toggleDevTools()
+	win.toggleDevTools()
 
 	let menuTemplate = [
 		{
