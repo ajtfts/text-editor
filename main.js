@@ -13,15 +13,28 @@ function createWindow () {
 		slashes: true
 	}))
 
+	//win.toggleDevTools()
+
 	let menuTemplate = [
 		{
 			label: 'File',
 			submenu: [
 				{
+					label: 'Open...',
+					click: () => {
+						win.webContents.send('openFile')
+					}
+				},
+				{
 					label: 'Save',
 					click: () => {
-						console.log("you clicked save")
-						win.webContents.send('saveAs')
+						win.webContents.send('saveFile')
+					}
+				},
+				{
+					label: 'Save As...',
+					click: () => {
+						win.webContents.send('saveFileAs')
 					}
 				},
 			]

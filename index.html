@@ -14,13 +14,55 @@
 
 			const mainTextArea = document.getElementById("mainTextArea")
 
-			ipc.on('saveAs', () => {
-				dialog.showSaveDialog((fileName) => {
-					fs.writeFile(fileName, mainTextArea.value, (err) => {
+			let curFile
+
+			// enable tabbing on mainTextArea
+			mainTextArea.onkeydown = (e) => {
+				if (e.code == "Tab") {
+					e.preventDefault()
+					let start = mainTextArea.selectionStart
+					let end = mainTextArea.selectionEnd
+
+
+					mainTextArea.value = mainTextArea.value.substring(0, mainTextArea.selectionStart)
+											+ '\t' 
+											+ mainTextArea.value.substring(mainTextArea.selectionStart, mainTextArea.value.length)
+					mainTextArea.selectionStart = 
+					mainTextArea.selectionEnd = start+1
+				}
+			}
+
+			ipc.on('openFile', () => {
+				let options = {
+					properties: ['openFile']
+				}
+				curFile = dialog.showOpenDialog(options)[0]
+				fs.readFile(curFile, 'UTF-8', (err, data) => {
+					mainTextArea.value = data
+				})
+			})
+
+			ipc.on('saveFile', () => {
+				if (curFile === undefined) {
+					dialog.showSaveDialog((fileName) => {
+						fs.writeFile(fileName, mainTextArea.value, (err) => {
+							if (err) {
+								alert(err)
+							}
+						})
+					})
+				} else {
+					fs.writeFile(curFile, mainTextArea.value, (err) => {
 						if (err) {
 							alert(err)
 						}
 					})
+				}
+			})
+
+			ipc.on('saveFileAs', () => {
+				dialog.showSaveDialog((fileName) => {
+					fs.writeFile(fileName, mainTextArea.value)
 				})
 			})
 		</script>
