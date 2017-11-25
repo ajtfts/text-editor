@@ -3,6 +3,7 @@
 	<head>
 		<meta charset="UTF-8">
 		<title>Text Editor</title>
+		<link href="https://fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet">
 		<link rel="stylesheet" type="text/css" href="style.css">
 	</head>
 	<body>
@@ -46,10 +47,18 @@
 			}
 
 			ipc.on('newFile', () => {
-				curFile = undefined
-				mainTextArea.value = ""
-				unsavedChanges = true
-				updateTitle()
+				choice = dialog.showMessageBox({
+					type: 'question',
+					buttons: ['Yes', 'No'],
+					title: 'Confirm',
+					message: 'You have made unsaved changes. Are you sure you would like to quit?'
+				})
+				if (choice === 0) {
+					curFile = undefined
+					mainTextArea.value = ""
+					unsavedChanges = true
+					updateTitle()
+				}
 			})
 
 			ipc.on('openFile', () => {
@@ -110,7 +119,6 @@
 					})
 					console.log(choice)
 					if (choice === 0) {
-						console.log("please close")
 						remote.getCurrentWindow().close()
 					}
 				}

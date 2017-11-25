@@ -1,3 +1,7 @@
+html {
+	font-family: 'Source Code Pro', monospace;
+}
+
 #mainTextArea {
 	resize: none;
 	outline: none;
@@ -11,4 +15,6 @@
     margin: 0;
     border: 0;
     padding: 0;
+    font-family: inherit;
+    font-size: inherit;
 }
